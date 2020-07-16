@@ -1,0 +1,38 @@
+<div class="board-parent-container" *ngIf="board.length >0; else elseBlock">
+  <div class="board-child-container">
+    <table class="table" #boardEl>
+      <tr *ngFor="let row of board let r = index">
+        <td *ngFor="let col of row let c = index"
+         [ngClass]="'td-row' + r + ' td-col' + c"
+         (click)="onCellClick(r, c)"
+          (mouseover)="onCellHover(r, c, true)"
+          (mouseout)="onCellHover(r, c, false)">
+          <div class="cell" [ngClass]="'cell-row' + r + ' cell-col' + c"
+            [class.player1]="col === playerValue.Player1" [class.player2]="col === playerValue.Player2">
+          </div>
+        </td>
+      </tr>
+    </table>
+
+
+    <div
+      class="board-overlay"
+      *ngIf="winner || looser || tied"
+      [class.winner]="winner === true"
+      [class.loser]="looser === true"
+      [class.tied]="tied === true">
+      <span *ngIf="tied">Game Tied</span>
+      <span *ngIf="winner">You Win</span>
+      <span *ngIf="looser">You lose</span>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #elseBlock>
+  <div class="player-content">
+    <div class="player-content-block">
+    <span>{{status}}</span>
+  </div>
+  </div>
+</ng-template>

@@ -1,0 +1,103 @@
+
+.board-parent-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+
+  .board-child-container {
+    position: relative;
+
+
+
+
+    .board-overlay {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border-radius: 15px;
+      background-color: transparent;
+      transition: background-color .4s ease;
+
+      span {
+        display: block;
+        margin: 0;
+        padding: 0;
+        color: #fff;
+        font-size: 2rem;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      &.winner {
+        background-color: transparentize(#8BC34A, 0.2);
+      }
+
+      &.loser {
+        background-color: transparentize(#DC4437, 0.2);
+      }
+      &.tied{
+        background-color: transparentize(#DE5745, 0.2);
+      }
+
+    }
+
+  table {
+    border-collapse: collapse;
+    border-radius: 15px;
+    overflow: hidden;
+
+    td {
+      border: none;
+      padding: 5px;
+      background: #dadada;
+      cursor: pointer;
+
+      &.highlight {
+        background: lighten(#dadada, 5%);
+      }
+
+      &.board-disabled {
+        cursor: not-allowed;
+      }
+
+      .cell {
+        border: 2px solid darken(#dadada, 4%);
+        height: 37px;
+        width: 37px;
+        background: white;
+        margin: 0 auto;
+        border-radius: 50%;
+
+        &.player1 {
+          background: #ff0000;
+        }
+        &.player1-ghost {
+          background: transparentize(#ff0000, 0.5);
+        }
+
+
+
+        &.player2 {
+          background: #0000cc;
+        }
+        &.player2-ghost {
+          background: transparentize(#0000cc, 0.5);
+        }
+      }
+    }
+  }
+}
+}
+
+.player-content{
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .player-content-block{
+
+  }
+}

@@ -1,0 +1,32 @@
+<div class="main-content">
+<div class="card card-content">
+<form style="width: 70%;" [formGroup]="playerForm">
+  <div class="form-group">
+    <input type="email" class="form-control" placeholder="Enter Player Name" formControlName="playerName">
+    <div class="validation-errors">
+      <ng-container *ngFor="let validation of validationMessages.playerName">
+        <div class="error-message"
+          *ngIf="playerForm.get('playerName').hasError(validation.type) && (playerForm.get('playerName').dirty || playerForm.get('playerName').touched)">
+          <span style="color: red;">*{{ validation.message }}</span>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <input type="email" class="form-control" placeholder="Enter Dynamic matrix Number" formControlName="matrix">
+    <div class="validation-errors">
+      <ng-container *ngFor="let validation of validationMessages.matrix">
+        <div class="error-message"
+          *ngIf="playerForm.get('matrix').hasError(validation.type) && (playerForm.get('matrix').dirty || playerForm.get('matrix').touched)">
+          <span style="color: red;">*{{ validation.message }}</span>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary" (click)="gameDetails(playerForm)" [disabled]="playerForm.invalid">Submit</button>
+</form>
+</div>
+</div>
+<app-board></app-board>
