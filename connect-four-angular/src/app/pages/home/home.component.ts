@@ -3,12 +3,8 @@ import {
   FormBuilder,
   FormGroup,
   Validators,
-  FormControl,
-  ValidatorFn,
-  AbstractControl,
 } from '@angular/forms';
 
-import { BoardComponent } from '../board/board.component';
 import { SocketService } from 'src/app/services/socket.service';
 import { ValidationMsg } from 'src/app/models/validation';
 

@@ -1,38 +1,60 @@
-const {
-  EMPTY,
-} = require('../constants');
+const schema = require('./schema');
+const { EMPTY,} = require('../constants');
 
 // function for generate board
-function generateBoard(matrix) {
-  let board = [];
-  for (let i = 0; i < matrix; i++) {
-    board[i] = [];
-    for (let j = 0; j < matrix; j++) {
-      board[i][j] = EMPTY;
-    }
-  }
-  return board;
-}
+
 
 /**
  * Represents a Connect 4 board as 2-D array
  */
 class Board {
   constructor(matrix) {
-    this.board = generateBoard(matrix);
+    //this.board = generateBoard(matrix, player1Id, player2Id);
     this.matrix = matrix;
   }
+
+  generateBoard(player1Id, player2Id) {
+    const players = [];
+   players.push(player1Id, player2Id);
+   let board = [];
+   for (let i = 0; i < this.matrix; i++) {
+     board[i] = [];
+     for (let j = 0; j < this.matrix; j++) {
+       board[i][j] = EMPTY;
+     }
+   }
+  return new schema.board({
+     "players": players,
+     "board": board
+   }).save((err, res) => {
+     this.board = res.board
+   })
+  // return board;
+  }
+
 
   /**
    * return a board
    */
-  getBoard() {
-    let board = [];
+  getBoard(playerId) {
+   console.log('playerId' +playerId);
+   return schema.board.findOne({
+      "players": {
+        $in: [playerId]
+      }
+   }, (err, response) => {
+       console.log(err);
+      console.log(response.board);
+   }).select({_id:0, board:1}).lean();
+
+/*     let board = [];
     for (let i = 0; i < this.board.length; i++) {
       board[i] = this.board[i].slice(0);
     }
-    return board;
+    // console.log(board);*/
   }
+
+
 
   /**
    * Drop a token into a board column. If no more space in the
@@ -41,15 +63,29 @@ class Board {
    * @param {number} tokenColor - either RED or BLUE
    * @returns {boolean} true if token was added, false otherwise
    */
-  addToken(column, tokenColor) {
+  addToken(playerId, column, tokenColor) {
+
+    //  console.log(column);
     for (let row = this.matrix - 1; row >= 0; row--) {
       if (this.board[row][column] === EMPTY) {
         this.board[row][column] = tokenColor;
+        schema.board.update({
+          "players": {
+            $in: [playerId]
+          }
+        }, {
+          $set: {
+            "board": this.board
+          }
+        }, (error, result) => {
+        })
         return true;
       }
     }
     return false;
   }
+
+
 
   /**
    * Check for game end condition. Connect 4 would involve last played
@@ -60,11 +96,13 @@ class Board {
     // already know column of last piece played,
     // i.e. the highest piece in the played column
     let row;
-    for (row = 0; this.board[row][column] === EMPTY && row < this.matrix; row++) { }
-      return this.checkForHorizontalWin(row, column) ||
-        this.checkForVerticalWin(row, column) ||
-        this.checkForDiagonalWin(row, column);
+    for (row = 0; this.board[row][column] === EMPTY && row < this.matrix; row++) {}
+    return this.checkForHorizontalWin(row, column) ||
+      this.checkForVerticalWin(row, column) ||
+      this.checkForDiagonalWin(row, column);
   }
+
+
 
   /**
    * Only need to check that top row is full since tokens stack
@@ -74,6 +112,8 @@ class Board {
     let topRow = this.board[0];
     return topRow.indexOf(EMPTY) === -1;
   }
+
+
 
   /**
    * Iterate over board row where last piece was dropped
@@ -86,9 +126,10 @@ class Board {
     let color = this.board[row][column];
     let winningString = [color, color, color, color].join('');
     let stringRow = this.board[row].join('');
-    console.log(stringRow);
     return stringRow.indexOf(winningString) !== -1;
   }
+
+
 
   /**
    * Iterate over column where last piece was dropped
@@ -102,10 +143,13 @@ class Board {
     let color = this.board[row][column];
     return ((row + 3) < this.matrix) &&
       this.board[row][column] === color &&
-      this.board[row+1][column] === color &&
-      this.board[row+2][column] === color &&
-      this.board[row+3][column] === color;
-   }
+      this.board[row + 1][column] === color &&
+      this.board[row + 2][column] === color &&
+      this.board[row + 3][column] === color;
+  }
+
+
+
 
   /**
    * check peices diagonally

@@ -1,5 +1,5 @@
 
-// This class contains validation for player
+// This class contains validation for edit profile component
 export class ValidationMsg {
   validationMsg = {
     playerName: [

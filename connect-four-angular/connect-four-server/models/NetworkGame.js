@@ -3,6 +3,7 @@ const { UPDATE_EVENT } = require('../constants');
 
 class NetworkGame extends Game {
 
+
   /**
    * Create a game with player sockets
    * @param {socket.io socket} player1Socket
@@ -17,19 +18,24 @@ class NetworkGame extends Game {
     this.opponentDisconnected = false;
   }
 
+
+
   /**
    * Indicate the opponent has disconnected from the game server
    */
   setOpponentDisconnected() {
+   // this.destroy();
     this.opponentDisconnected = true;
     this.gameOver = true;
   }
 
+
   /**
    * Broadcast the game state to each player socket
    */
-  broadcast() {
-    let data = this.getGameStateForPlayer(this.player1Socket.id, this.player1Socket.playername);
+  async broadcast() {
+
+    let data = await this.getGameStateForPlayer(this.player1Socket.id, this.player1Socket.playername);
     if (this.opponentDisconnected) {
       data.status = this.player2Socket.playername + ' is offline. Refresh the page to start a new game.';
       this.player1Socket.emit(UPDATE_EVENT, { status: data.status, board:[]  });
@@ -38,7 +44,7 @@ class NetworkGame extends Game {
     }
 
 
-    data = this.getGameStateForPlayer(this.player2Socket.id, this.player2Socket.playername);
+    data = await this.getGameStateForPlayer(this.player2Socket.id, this.player2Socket.playername);
     if (this.opponentDisconnected) {
       data.status = this.player1Socket.playername + ' is offline. Refresh the page to start a new game.';
       this.player2Socket.emit(UPDATE_EVENT, { status: data.status, board:[] });
@@ -46,6 +52,7 @@ class NetworkGame extends Game {
       this.player2Socket.emit(UPDATE_EVENT, data);
     }
   }
+
 }
 
 module.exports = NetworkGame;

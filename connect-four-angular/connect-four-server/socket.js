@@ -11,19 +11,27 @@ module.exports = {
   let games = {};
   let waitingPlayerSocket = null;
   let previousLength = null;
+
+
+
   io.on('connection', function (socket) {
     console.log('new player connected', socket.id);
 
-    socket.on('join', (data) => {
+
+    socket.on('join', async (data) => {
       socket.join(socket.id);
       socket.playername = data.playername
 
       const currentLength = data.matrix;
     /***** start game *****/
       if (waitingPlayerSocket !== null && currentLength === previousLength) {
-      console.log('game started', waitingPlayerSocket.id, socket.id);
-      let newGame = new NetworkGame(waitingPlayerSocket, socket, new Board(data.matrix));
+        console.log('game started', waitingPlayerSocket.id, socket.id);
+        let board = new Board(data.matrix);
+        await board.generateBoard(waitingPlayerSocket.id, socket.id);
+      let newGame = new NetworkGame(waitingPlayerSocket, socket, board);
       // store in hashmap indexed by player connection for future lookup
+      //  console.log(newGame);
+      //newGame.generateBoard(waitingPlayerSocket.id, socket.id);
       games[socket.id] = newGame;
       games[waitingPlayerSocket.id] = newGame;
       waitingPlayerSocket = null;
@@ -35,6 +43,7 @@ module.exports = {
       console.log('player waiting');
     }
     });
+
 
 
     /***** end game *****/
@@ -50,26 +59,27 @@ module.exports = {
         let currentGame = games[socket.id];
         if (currentGame) {
           let opponentSocket = currentGame.getOpponent(socket.id);
-
           currentGame.setOpponentDisconnected();
           currentGame.broadcast();
-
-          currentGame.destroy();
-          delete games[socket.id];
-          delete games[opponentSocket];
-          delete currentGame;
+            // currentGame.destroy();
+            delete games[socket.id];
+            delete games[opponentSocket];
+            delete currentGame;
         }
       }
     });
+
+
 
     /***** incoming move *****/
     socket.on(MOVE_EVENT, function (column) {
       console.log('player moved', column, socket.id);
       let currentGame = games[socket.id];
-      console.log(currentGame);
       if (currentGame) {
         currentGame.move(socket.id, parseInt(column));
-        currentGame.broadcast();
+        setImmediate(() => {
+          currentGame.broadcast();
+        });
       }
     });
   });
